@@ -7,8 +7,18 @@
 - Name: "Hexmer - Map Maker".
 - Offset layout decision: even-r (pointy-top); even-q (flat-top) planned.
 
-## Next
-- Milestone 1 — Hex grid foundation (coordinate math, rendering, picking, zoom, pan).
+## Milestone 1 — Hex grid foundation (in progress)
+- [x] Step 1: core hex math (`scripts/core/`), 22 tests green
+  - `HexCoordinates`: axial↔cube, cube rounding, distance, neighbours, lines, even-r offset.
+  - `HexLayout`: pointy/flat orientation, hex size, origin; hex↔pixel, corners.
+  - `HexGrid`: finite width × height bounds in even-r offset space.
+- [ ] Step 2: chunked grid renderer (`scripts/rendering/hex_map_renderer.gd`), no Node per hex.
+- [ ] Step 3: main scene + viewport camera: zoom to cursor, middle/space-drag pan (InputMap).
+- [ ] Step 4: hover/click picking, status bar (axial coords, map size, zoom %),
+      grid size/orientation settings. Acceptance: navigate 100 × 100, click identifies a hex.
 
 ## Known issues
-- GUT exits 0 when no tests exist ("Nothing was run"); `tests/` arrives with Milestone 1.
+- Bounds are always even-r. Flat-top maps therefore come out slanted, not rectangular,
+  until even-q is added.
+- The layout enum is `HexLayout.HexOrientation`; plain `Orientation` clashes with Godot's
+  global `Orientation` enum.

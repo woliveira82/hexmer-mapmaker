@@ -49,6 +49,9 @@ Read it before starting any milestone. Current progress lives in `docs/PROGRESS.
   `.godot/` cache, re-run the import.
 Always run the tests after changing anything in `scripts/core/` or `scripts/generation/`,
 and fix failures before reporting a task as done.
+GUT silently skips test scripts that fail to parse and still reports "All tests passed":
+also check the output for `SCRIPT ERROR` / `Ignoring script` and that the script count is right.
+Run `--import` after adding a new `class_name` so the global class cache is updated.
 
 ## Tests (required)
 Located in `tests/`, prefixed `test_`. Must cover at minimum:

@@ -1,12 +1,14 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cwwog0het3wf3"]
 
-[ext_resource type="Script" path="res://scripts/ui/main.gd" id="1_main"]
-[ext_resource type="Script" path="res://scripts/rendering/hex_map_renderer.gd" id="2_renderer"]
+[ext_resource type="Script" uid="uid://d0u3gabbc4tha" path="res://scripts/ui/main.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://d0f4j8tyervvx" path="res://scripts/rendering/hex_map_renderer.gd" id="2_renderer"]
+[ext_resource type="Script" uid="uid://d3j20kmijrryd" path="res://scripts/ui/map_camera.gd" id="3_camera"]
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=1211738723]
 script = ExtResource("1_main")
 
-[node name="HexMapRenderer" type="Node2D" parent="."]
+[node name="HexMapRenderer" type="Node2D" parent="." unique_id=2137787057]
 script = ExtResource("2_renderer")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="MapCamera" type="Camera2D" parent="." unique_id=1100489153]
+script = ExtResource("3_camera")

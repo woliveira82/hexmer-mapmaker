@@ -18,12 +18,18 @@
   - `HexGrid.cells_in_offset_rect()` for chunk queries.
   - `scenes/main/main.tscn` (set as main scene): 100 × 100 pointy-top grid, camera fitted
     to the map. Map size/orientation/hex size are exports on the Main node.
-- [ ] Step 3: viewport camera: zoom to cursor, middle/space-drag pan (InputMap).
+- [x] Step 3: viewport camera, 37 tests green
+  - `MapCamera` (`scripts/ui/map_camera.gd`): wheel zoom toward cursor (clamped 1 %–800 %),
+    middle-drag or Space + left-drag pan, Home fits the map.
+  - InputMap actions in project.godot: `camera_zoom_in/out`, `camera_pan`,
+    `camera_pan_hold`, `camera_fit`, `editor_primary` (left click, for tools).
 - [ ] Step 4: hover/click picking, status bar (axial coords, map size, zoom %),
       grid size/orientation settings. Acceptance: navigate 100 × 100, click identifies a hex.
 
 ## Known issues
 - Bounds are always even-r. Flat-top maps therefore come out slanted, not rectangular,
   until even-q is added.
+- Touchpad pinch/pan gestures (`InputEventMagnifyGesture` / `InputEventPanGesture`) are not
+  handled yet; touchpad scrolling works as wheel zoom.
 - The layout enum is `HexLayout.HexOrientation`; plain `Orientation` clashes with Godot's
   global `Orientation` enum.

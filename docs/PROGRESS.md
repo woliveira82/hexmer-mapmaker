@@ -12,8 +12,13 @@
   - `HexCoordinates`: axial↔cube, cube rounding, distance, neighbours, lines, even-r offset.
   - `HexLayout`: pointy/flat orientation, hex size, origin; hex↔pixel, corners.
   - `HexGrid`: finite width × height bounds in even-r offset space.
-- [ ] Step 2: chunked grid renderer (`scripts/rendering/hex_map_renderer.gd`), no Node per hex.
-- [ ] Step 3: main scene + viewport camera: zoom to cursor, middle/space-drag pan (InputMap).
+- [x] Step 2: chunked grid renderer + main scene, 28 tests green
+  - `HexMapRenderer` splits the map into 16 × 16 offset-cell `HexGridChunk`s (49 nodes for
+    100 × 100); each chunk draws its outlines with one `draw_multiline` call.
+  - `HexGrid.cells_in_offset_rect()` for chunk queries.
+  - `scenes/main/main.tscn` (set as main scene): 100 × 100 pointy-top grid, camera fitted
+    to the map. Map size/orientation/hex size are exports on the Main node.
+- [ ] Step 3: viewport camera: zoom to cursor, middle/space-drag pan (InputMap).
 - [ ] Step 4: hover/click picking, status bar (axial coords, map size, zoom %),
       grid size/orientation settings. Acceptance: navigate 100 × 100, click identifies a hex.
 

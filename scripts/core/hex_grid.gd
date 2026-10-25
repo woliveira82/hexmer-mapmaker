@@ -25,11 +25,18 @@ func cell_count() -> int:
 
 ## Returns every axial hex in the map, row by row.
 func cells() -> Array[Vector2i]:
+	return cells_in_offset_rect(Rect2i(0, 0, width, height))
+
+
+## Returns the axial hexes whose even-r offset (col, row) lies in [param rect],
+## clipped to the map bounds, row by row. Used to split the map into chunks.
+func cells_in_offset_rect(rect: Rect2i) -> Array[Vector2i]:
+	var clipped: Rect2i = rect.intersection(Rect2i(0, 0, width, height))
 	var result: Array[Vector2i] = []
-	result.resize(cell_count())
+	result.resize(clipped.get_area())
 	var i: int = 0
-	for row: int in range(height):
-		for col: int in range(width):
+	for row: int in range(clipped.position.y, clipped.end.y):
+		for col: int in range(clipped.position.x, clipped.end.x):
 			result[i] = HexCoordinates.even_r_to_axial(Vector2i(col, row))
 			i += 1
 	return result

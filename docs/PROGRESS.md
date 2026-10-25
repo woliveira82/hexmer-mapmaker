@@ -23,8 +23,17 @@
     middle-drag or Space + left-drag pan, Home fits the map.
   - InputMap actions in project.godot: `camera_zoom_in/out`, `camera_pan`,
     `camera_pan_hold`, `camera_fit`, `editor_primary` (left click, for tools).
-- [ ] Step 4: hover/click picking, status bar (axial coords, map size, zoom %),
-      grid size/orientation settings. Acceptance: navigate 100 × 100, click identifies a hex.
+- [x] Step 4a: hover/click picking + status bar, 48 tests green
+  - `EditorController` (`scripts/tools/`): hovered/selected hex from map-space positions,
+    `hovered_changed` / `selected_changed` signals. Clicking off the map clears the selection.
+  - `HexHighlight` (`scripts/rendering/`): hover (white) and selection (amber) outlines,
+    constant on-screen width at any zoom.
+  - `StatusBar` (`scenes/editor/status_bar.tscn`): hovered hex, selected hex (axial +
+    even-r offset), map size/orientation, zoom %.
+  - `test_main_scene.gd` checks the acceptance criteria headless: 100 × 100 map loads, and
+    clicking identifies hexes (corners included) in both orientations.
+- [ ] Step 4b: map settings panel (width, height, orientation, hex size → rebuild map).
+      Then manual acceptance check in the Windows editor → Milestone 1 done.
 
 ## Known issues
 - Bounds are always even-r. Flat-top maps therefore come out slanted, not rectangular,

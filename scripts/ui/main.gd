@@ -1,14 +1,19 @@
 extends Node2D
-## Main scene composition root: builds the map, wires input to the editor controller
-## and controller signals to the highlight and status bar.
+## Main scene composition root: owns the map data and terrain registry, builds the map,
+## wires input to the editor controller and controller signals to the highlight and status bar.
 
 @export_range(1, 1000) var map_width: int = 100
 @export_range(1, 1000) var map_height: int = 100
 @export var orientation: HexLayout.HexOrientation = HexLayout.HexOrientation.POINTY_TOP
 @export var hex_size: float = 32.0
+## Terrain that fills the base layer of new maps; empty leaves new maps blank.
+@export var default_terrain: StringName = &"grassland"
 
+var _registry: TerrainRegistry
+var _map: MapData
 var _controller: EditorController
 
+@onready var _terrain_renderer: TerrainRenderer = $TerrainRenderer
 @onready var _renderer: HexMapRenderer = $HexMapRenderer
 @onready var _highlight: HexHighlight = $HexHighlight
 @onready var _camera: MapCamera = $MapCamera
@@ -17,7 +22,9 @@ var _controller: EditorController
 
 
 func _ready() -> void:
-	_controller = EditorController.new(HexGrid.new(map_width, map_height), _make_layout())
+	_registry = TerrainRegistry.create_starter()
+	_map = _make_map()
+	_controller = EditorController.new(_map.grid, _map.layout)
 	_controller.hovered_changed.connect(_on_hovered_changed)
 	_controller.selected_changed.connect(_on_selected_changed)
 	_camera.view_changed.connect(_on_view_changed)
@@ -34,17 +41,23 @@ func rebuild_map(
 	map_height = p_height
 	orientation = p_orientation
 	hex_size = p_hex_size
-	_controller.set_map(HexGrid.new(map_width, map_height), _make_layout())
+	_map = _make_map()
+	_controller.set_map(_map.grid, _map.layout)
 	_show_map()
 
 
-func _make_layout() -> HexLayout:
-	return HexLayout.new(orientation, Vector2(hex_size, hex_size))
+func _make_map() -> MapData:
+	var layout := HexLayout.new(orientation, Vector2(hex_size, hex_size))
+	var map := MapData.create_default(HexGrid.new(map_width, map_height), layout)
+	if not default_terrain.is_empty():
+		map.fill_layer(map.get_layers()[0].id, MapCell.new(default_terrain))
+	return map
 
 
 func _show_map() -> void:
-	var grid: HexGrid = _controller.grid
-	var layout: HexLayout = _controller.layout
+	var grid: HexGrid = _map.grid
+	var layout: HexLayout = _map.layout
+	_terrain_renderer.set_map(_map, _registry)
 	_renderer.set_map(grid, layout)
 	_highlight.layout = layout
 	_highlight.queue_redraw()

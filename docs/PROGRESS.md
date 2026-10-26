@@ -61,7 +61,18 @@
     redo cleared on new edits, `max_size` (200), `changed` signal, descriptions.
   - Tests: round trips, layer isolation, locked layers, merged strokes, 40 random edits
     undone/redone back to identical snapshots.
-- [ ] Step 3: chunked terrain renderer (sprite or placeholder colour, per visible layer).
+- [x] Step 3: chunked terrain renderer, 87 tests green
+  - `TerrainRenderer` + `TerrainChunk` (`scripts/rendering/`): 16 × 16 offset-cell chunks
+    under the grid. Each chunk draws visible layers bottom first; per layer, one
+    `RenderingServer.canvas_item_add_triangle_array` call per texture plus one for
+    textureless hexes. Sprites are UV-mapped onto the hex (works for both orientations).
+  - Placeholders: definition colour when a terrain has no sprites; magenta for unknown IDs
+    (cell data kept).
+  - `cells_changed` redraws only the touched chunks; `layers_changed` redraws all.
+  - `MapData.fill_layer()`. `Main` owns `MapData` + `TerrainRegistry`; new maps (and
+    Map settings → Apply) fill the base layer with `default_terrain` (grassland).
+- [ ] **Manual check in the Windows editor:** grassland sprites under the grid outlines,
+      both orientations, after Apply.
 - [ ] Step 4: terrain palette, paint/erase tools (drag = one undo step), undo/redo shortcuts.
 - [ ] Step 5: layer panel (create, rename, hide, lock, reorder, delete).
 - [ ] Step 6: selection tool (single, group, rectangle), then fill.
@@ -76,7 +87,10 @@
   until even-q is added.
 - Touchpad pinch/pan gestures (`InputEventMagnifyGesture` / `InputEventPanGesture`) are not
   handled yet; touchpad scrolling works as wheel zoom.
-- `MapData` is not wired into the main scene yet (step 3/4).
+- Large maps are slow: create + first draw takes ~0.1 s at 100 × 100, ~1 s at 300 × 300,
+  ~12 s and ~140 MB at 1000 × 1000 (headless timing). Layer visibility/order changes redraw
+  every chunk (~9 s at 1000 × 1000). Options: build batches only for on-screen chunks,
+  cache batches per layer, or a lower size limit.
 - GDScript consts can't use `PackedStringArray(...)` constructors; use typed `Array[String]`.
 - The layout enum is `HexLayout.HexOrientation`; plain `Orientation` clashes with Godot's
   global `Orientation` enum.

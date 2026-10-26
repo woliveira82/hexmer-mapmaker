@@ -6,9 +6,13 @@
 [ext_resource type="Script" uid="uid://d1t7r2m5ym53m" path="res://scripts/rendering/hex_highlight.gd" id="4_highlight"]
 [ext_resource type="PackedScene" path="res://scenes/editor/status_bar.tscn" id="5_status"]
 [ext_resource type="PackedScene" path="res://scenes/editor/map_settings_panel.tscn" id="6_settings"]
+[ext_resource type="Script" path="res://scripts/rendering/terrain_renderer.gd" id="7_terrain"]
 
 [node name="Main" type="Node2D" unique_id=1211738723]
 script = ExtResource("1_main")
+
+[node name="TerrainRenderer" type="Node2D" parent="."]
+script = ExtResource("7_terrain")
 
 [node name="HexMapRenderer" type="Node2D" parent="." unique_id=2137787057]
 script = ExtResource("2_renderer")

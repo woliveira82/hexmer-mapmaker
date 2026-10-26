@@ -146,6 +146,15 @@ func set_cell(layer_id: int, hex: Vector2i, cell: MapCell) -> bool:
 	return set_cells(layer_id, cells) == 1
 
 
+## Sets every hex in the map on layer [param layer_id] to [param cell] (shared, since cells
+## are immutable). Returns how many were set.
+func fill_layer(layer_id: int, cell: MapCell) -> int:
+	var cells: Dictionary[Vector2i, MapCell] = {}
+	for hex: Vector2i in grid.cells():
+		cells[hex] = cell
+	return set_cells(layer_id, cells)
+
+
 ## Sets several cells on one layer in one go (null values clear) and emits
 ## [signal cells_changed] once. Hexes outside the map are skipped. Returns how many were set.
 func set_cells(layer_id: int, cells: Dictionary[Vector2i, MapCell]) -> int:

@@ -53,3 +53,41 @@ func test_settings_panel_rebuilds_map() -> void:
 	var status: StatusBar = main.get_node("UI/StatusBar")
 	assert_string_contains(status.get_texts()[1], StatusBar.NO_HEX_TEXT)
 	assert_string_contains(status.get_texts()[2], "20 × 10 flat-top")
+
+
+func test_new_map_starts_with_grassland_base() -> void:
+	var main := _make_main(HexLayout.HexOrientation.POINTY_TOP)
+	var map: MapData = main.get("_map")
+	assert_eq(map.layer_count(), MapData.DEFAULT_LAYER_NAMES.size())
+	var base: MapLayer = map.get_layers()[0]
+	assert_eq(base.cell_count(), 10000)
+	assert_eq(base.get_cell(Vector2i(10, 20)).terrain_id, &"grassland")
+	assert_eq(map.get_layers()[1].cell_count(), 0, "other layers start empty")
+	var terrain: TerrainRenderer = main.get_node("TerrainRenderer")
+	assert_eq(terrain.get_chunks().size(), 49)
+	assert_lt(terrain.get_index(), main.get_node("HexMapRenderer").get_index(), "terrain drawn under the grid")
+	var batches := terrain.get_chunks()[0].build_batches()
+	assert_eq(batches.size(), 1)
+	assert_not_null(batches[0].texture, "grassland drawn with its sprite")
+
+
+func test_rebuild_replaces_map_data_and_terrain() -> void:
+	var main := _make_main(HexLayout.HexOrientation.POINTY_TOP)
+	var old_map: MapData = main.get("_map")
+	main.rebuild_map(20, 10, HexLayout.HexOrientation.FLAT_TOP, 16.0)
+	var map: MapData = main.get("_map")
+	assert_ne(map, old_map)
+	assert_eq(map.get_layers()[0].cell_count(), 200)
+	assert_eq(map.layout.orientation, HexLayout.HexOrientation.FLAT_TOP)
+	var controller: EditorController = main.get("_controller")
+	assert_eq(controller.grid, map.grid, "controller picks on the new map")
+	var terrain: TerrainRenderer = main.get_node("TerrainRenderer")
+	assert_eq(terrain.get_chunks().size(), 2)
+
+
+func test_empty_default_terrain_leaves_map_blank() -> void:
+	var main: Node2D = MainScene.instantiate()
+	main.set("default_terrain", &"")
+	add_child_autofree(main)
+	var map: MapData = main.get("_map")
+	assert_eq(map.get_layers()[0].cell_count(), 0)

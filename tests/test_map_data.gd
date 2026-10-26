@@ -108,3 +108,14 @@ func test_cell_equality() -> void:
 	assert_true(MapCell.new(&"a", 1).equals(MapCell.new(&"a", 1)))
 	assert_false(MapCell.new(&"a", 1).equals(MapCell.new(&"a", 2)))
 	assert_false(MapCell.new(&"a").equals(null))
+
+
+func test_fill_layer_covers_every_hex_on_that_layer_only() -> void:
+	var map := _make_map()
+	var base: int = map.get_layers()[0].id
+	watch_signals(map)
+	assert_eq(map.fill_layer(base, MapCell.new(&"grassland")), 80)
+	assert_eq(map.get_layer(base).cell_count(), 80)
+	assert_eq(map.get_layers()[1].cell_count(), 0)
+	assert_signal_emit_count(map, "cells_changed", 1)
+	assert_eq(map.fill_layer(999, MapCell.new(&"grassland")), 0, "missing layer")

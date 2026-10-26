@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/editor/status_bar.tscn" id="5_status"]
 [ext_resource type="PackedScene" path="res://scenes/editor/map_settings_panel.tscn" id="6_settings"]
 [ext_resource type="Script" path="res://scripts/rendering/terrain_renderer.gd" id="7_terrain"]
+[ext_resource type="PackedScene" path="res://scenes/editor/terrain_palette.tscn" id="8_palette"]
 
 [node name="Main" type="Node2D" unique_id=1211738723]
 script = ExtResource("1_main")
@@ -28,3 +29,5 @@ script = ExtResource("3_camera")
 [node name="StatusBar" parent="UI" unique_id=1785105448 instance=ExtResource("5_status")]
 
 [node name="MapSettingsPanel" parent="UI" unique_id=1919669961 instance=ExtResource("6_settings")]
+
+[node name="TerrainPalette" parent="UI" instance=ExtResource("8_palette")]

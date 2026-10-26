@@ -1,0 +1,78 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/terrain_palette.gd" id="1_palette"]
+
+[node name="TerrainPalette" type="PanelContainer"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 208.0
+script = ExtResource("1_palette")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Rows" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ToolsTitle" type="Label" parent="Margin/Rows"]
+layout_mode = 2
+text = "Tools"
+
+[node name="Tools" type="HBoxContainer" parent="Margin/Rows"]
+layout_mode = 2
+
+[node name="SelectButton" type="Button" parent="Margin/Rows/Tools"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "Select"
+
+[node name="PaintButton" type="Button" parent="Margin/Rows/Tools"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "Paint"
+
+[node name="EraseButton" type="Button" parent="Margin/Rows/Tools"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "Erase"
+
+[node name="History" type="HBoxContainer" parent="Margin/Rows"]
+layout_mode = 2
+
+[node name="UndoButton" type="Button" parent="Margin/Rows/History"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "Undo"
+
+[node name="RedoButton" type="Button" parent="Margin/Rows/History"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "Redo"
+
+[node name="Separator" type="HSeparator" parent="Margin/Rows"]
+layout_mode = 2
+
+[node name="TerrainTitle" type="Label" parent="Margin/Rows"]
+layout_mode = 2
+text = "Terrain"
+
+[node name="TerrainList" type="ItemList" parent="Margin/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+auto_height = true

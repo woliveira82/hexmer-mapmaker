@@ -6,7 +6,8 @@ const ORIENTATIONS: Array[HexLayout.HexOrientation] = [
 
 
 func _make(orientation: HexLayout.HexOrientation = HexLayout.HexOrientation.POINTY_TOP) -> EditorController:
-	return EditorController.new(HexGrid.new(10, 8), HexLayout.new(orientation, Vector2(20.0, 20.0)))
+	var map := MapData.create_default(HexGrid.new(10, 8), HexLayout.new(orientation, Vector2(20.0, 20.0)))
+	return EditorController.new(map, TerrainRegistry.create_starter())
 
 
 func test_hover_inside_emits_once_per_hex() -> void:
@@ -75,11 +76,11 @@ func test_set_map_clears_hover_and_selection() -> void:
 	controller.update_hover(controller.layout.hex_to_pixel(Vector2i(1, 1)))
 	controller.select(Vector2i(2, 2))
 	watch_signals(controller)
-	var grid := HexGrid.new(3, 3)
-	controller.set_map(grid, HexLayout.new(HexLayout.HexOrientation.FLAT_TOP))
+	var map := MapData.create_default(HexGrid.new(3, 3), HexLayout.new(HexLayout.HexOrientation.FLAT_TOP))
+	controller.set_map(map)
 	assert_signal_emitted_with_parameters(controller, "hovered_changed", [Vector2i(1, 1), false])
 	assert_signal_emitted_with_parameters(controller, "selected_changed", [Vector2i(2, 2), false])
 	assert_false(controller.is_hovering)
 	assert_false(controller.has_selection)
-	assert_eq(controller.grid, grid)
+	assert_eq(controller.map, map)
 	assert_eq(controller.layout.orientation, HexLayout.HexOrientation.FLAT_TOP)

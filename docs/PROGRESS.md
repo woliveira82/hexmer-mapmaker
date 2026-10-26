@@ -72,8 +72,25 @@
   - `MapData.fill_layer()`. `Main` owns `MapData` + `TerrainRegistry`; new maps (and
     Map settings → Apply) fill the base layer with `default_terrain` (grassland).
 - [ ] **Manual check in the Windows editor:** grassland sprites under the grid outlines,
-      both orientations, after Apply.
-- [ ] Step 4: terrain palette, paint/erase tools (drag = one undo step), undo/redo shortcuts.
+      both orientations, after Apply. (Step 3; not yet reported.)
+- [x] Step 4: palette, paint/erase, undo/redo, 107 tests green
+  - `EditorController` now takes `MapData` + `TerrainRegistry` (`grid`/`layout` are
+    getters). Owns the `UndoStack`, `active_tool` (SELECT/PAINT/ERASE), `active_terrain`,
+    `active_layer_id` (bottom layer until the layer panel exists).
+  - Strokes: `primary_pressed/dragged/released`; drags fill gaps with `HexCoordinates.line`;
+    each hex is painted once per stroke; a stroke is one undo step. Painting a hex that
+    already has the active terrain keeps its variant. New hexes get a random sprite variant.
+    Undo/redo or switching tool mid-stroke ends the stroke first. `set_map` clears history.
+  - `TerrainPalette` (`scenes/editor/terrain_palette.tscn`, top-left): Select/Paint/Erase,
+    Undo/Redo (disabled when unavailable, tooltips name the edit + shortcut), terrain list
+    with sprite icons (colour swatch if no sprite). Picking a terrain switches to Paint.
+    Palette controls take no keyboard focus (Space would press them; list search would eat
+    B/E/S). Clicking the map releases focus from panel fields.
+  - InputMap: `edit_undo` Ctrl+Z, `edit_redo` Ctrl+Y / Ctrl+Shift+Z, `tool_select` S,
+    `tool_paint` B, `tool_erase` E (logical keys, matched exactly).
+  - Mouse release is caught in `_input`, so a stroke ends even if released over a panel.
+- [ ] **Manual check in the Windows editor:** paint/erase strokes, fast drags, undo/redo
+      buttons + shortcuts, palette layout at the default 1152 × 648 window.
 - [ ] Step 5: layer panel (create, rename, hide, lock, reorder, delete).
 - [ ] Step 6: selection tool (single, group, rectangle), then fill.
 - [x] Placeholder sprites: 64 × 64 PNGs, two variants per starter terrain, in
@@ -87,6 +104,9 @@
   until even-q is added.
 - Touchpad pinch/pan gestures (`InputEventMagnifyGesture` / `InputEventPanGesture`) are not
   handled yet; touchpad scrolling works as wheel zoom.
+- Dragging across a panel pauses the stroke; re-entering the map joins the two points with
+  a line, which can paint hexes hidden under the panel.
+- Hover does not show the hex's terrain in the status bar yet.
 - Large maps are slow: create + first draw takes ~0.1 s at 100 × 100, ~1 s at 300 × 300,
   ~12 s and ~140 MB at 1000 × 1000 (headless timing). Layer visibility/order changes redraw
   every chunk (~9 s at 1000 × 1000). Options: build batches only for on-screen chunks,

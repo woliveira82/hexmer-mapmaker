@@ -91,3 +91,70 @@ func test_empty_default_terrain_leaves_map_blank() -> void:
 	add_child_autofree(main)
 	var map: MapData = main.get("_map")
 	assert_eq(map.get_layers()[0].cell_count(), 0)
+
+
+func _key(keycode: Key, ctrl: bool = false, shift: bool = false) -> InputEventKey:
+	var event := InputEventKey.new()
+	event.keycode = keycode
+	event.ctrl_pressed = ctrl
+	event.shift_pressed = shift
+	event.pressed = true
+	return event
+
+
+func test_palette_drives_painting_and_undo() -> void:
+	var main := _make_main(HexLayout.HexOrientation.POINTY_TOP)
+	var controller: EditorController = main.get("_controller")
+	var palette: TerrainPalette = main.get_node("UI/TerrainPalette")
+	var map: MapData = main.get("_map")
+	assert_eq(palette.get_terrain_ids().size(), 6)
+	palette.terrain_selected.emit(&"water")
+	assert_eq(controller.active_terrain, &"water")
+	assert_eq(controller.active_tool, EditorController.Tool.PAINT, "picking terrain switches to Paint")
+	assert_eq(palette.get_shown_tool(), EditorController.Tool.PAINT)
+	controller.primary_pressed(map.layout.hex_to_pixel(Vector2i(5, 5)))
+	controller.primary_dragged(map.layout.hex_to_pixel(Vector2i(8, 5)))
+	controller.primary_released()
+	assert_eq(map.get_cell(map.get_layers()[0].id, Vector2i(7, 5)).terrain_id, &"water")
+	assert_eq(palette.get_undo_buttons_enabled(), [true, false] as Array[bool])
+	palette.undo_requested.emit()
+	assert_eq(map.get_cell(map.get_layers()[0].id, Vector2i(7, 5)).terrain_id, &"grassland")
+	assert_eq(palette.get_undo_buttons_enabled(), [false, true] as Array[bool])
+
+
+func test_keyboard_shortcuts() -> void:
+	var main := _make_main(HexLayout.HexOrientation.POINTY_TOP)
+	var controller: EditorController = main.get("_controller")
+	var map: MapData = main.get("_map")
+	var base: int = map.get_layers()[0].id
+	main._unhandled_input(_key(KEY_E))
+	assert_eq(controller.active_tool, EditorController.Tool.ERASE)
+	main._unhandled_input(_key(KEY_S, true))
+	assert_eq(controller.active_tool, EditorController.Tool.ERASE, "Ctrl+S is not the Select shortcut")
+	main._unhandled_input(_key(KEY_B))
+	assert_eq(controller.active_tool, EditorController.Tool.PAINT)
+	controller.active_terrain = &"desert"
+	controller.primary_pressed(map.layout.hex_to_pixel(Vector2i(2, 2)))
+	controller.primary_released()
+	main._unhandled_input(_key(KEY_Z, true))
+	assert_eq(map.get_cell(base, Vector2i(2, 2)).terrain_id, &"grassland", "Ctrl+Z undoes")
+	main._unhandled_input(_key(KEY_Z, true, true))
+	assert_eq(map.get_cell(base, Vector2i(2, 2)).terrain_id, &"desert", "Ctrl+Shift+Z redoes")
+	main._unhandled_input(_key(KEY_Z, true))
+	main._unhandled_input(_key(KEY_Y, true))
+	assert_eq(map.get_cell(base, Vector2i(2, 2)).terrain_id, &"desert", "Ctrl+Y redoes")
+	main._unhandled_input(_key(KEY_S))
+	assert_eq(controller.active_tool, EditorController.Tool.SELECT)
+
+
+func test_rebuild_clears_undo_history() -> void:
+	var main := _make_main(HexLayout.HexOrientation.POINTY_TOP)
+	var controller: EditorController = main.get("_controller")
+	var palette: TerrainPalette = main.get_node("UI/TerrainPalette")
+	controller.active_tool = EditorController.Tool.PAINT
+	controller.active_terrain = &"snow"
+	controller.primary_pressed(controller.layout.hex_to_pixel(Vector2i(1, 1)))
+	controller.primary_released()
+	main.rebuild_map(10, 10, HexLayout.HexOrientation.POINTY_TOP, 32.0)
+	assert_false(controller.undo_stack.can_undo())
+	assert_eq(palette.get_undo_buttons_enabled(), [false, false] as Array[bool])

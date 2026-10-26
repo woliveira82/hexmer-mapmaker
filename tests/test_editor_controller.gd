@@ -68,3 +68,18 @@ func test_select_outside_map_is_ignored() -> void:
 	var controller := _make()
 	controller.select(Vector2i(-20, 0))
 	assert_false(controller.has_selection)
+
+
+func test_set_map_clears_hover_and_selection() -> void:
+	var controller := _make()
+	controller.update_hover(controller.layout.hex_to_pixel(Vector2i(1, 1)))
+	controller.select(Vector2i(2, 2))
+	watch_signals(controller)
+	var grid := HexGrid.new(3, 3)
+	controller.set_map(grid, HexLayout.new(HexLayout.HexOrientation.FLAT_TOP))
+	assert_signal_emitted_with_parameters(controller, "hovered_changed", [Vector2i(1, 1), false])
+	assert_signal_emitted_with_parameters(controller, "selected_changed", [Vector2i(2, 2), false])
+	assert_false(controller.is_hovering)
+	assert_false(controller.has_selection)
+	assert_eq(controller.grid, grid)
+	assert_eq(controller.layout.orientation, HexLayout.HexOrientation.FLAT_TOP)

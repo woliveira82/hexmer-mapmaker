@@ -1,0 +1,78 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/map_settings_panel.gd" id="1_panel"]
+
+[node name="MapSettingsPanel" type="PanelContainer"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -228.0
+offset_top = 8.0
+offset_right = -8.0
+grow_horizontal = 0
+script = ExtResource("1_panel")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Rows" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Margin/Rows"]
+layout_mode = 2
+text = "Map settings"
+
+[node name="Fields" type="GridContainer" parent="Margin/Rows"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="WidthLabel" type="Label" parent="Margin/Rows/Fields"]
+layout_mode = 2
+text = "Width"
+
+[node name="WidthSpin" type="SpinBox" parent="Margin/Rows/Fields"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+suffix = "hexes"
+
+[node name="HeightLabel" type="Label" parent="Margin/Rows/Fields"]
+layout_mode = 2
+text = "Height"
+
+[node name="HeightSpin" type="SpinBox" parent="Margin/Rows/Fields"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+suffix = "hexes"
+
+[node name="OrientationLabel" type="Label" parent="Margin/Rows/Fields"]
+layout_mode = 2
+text = "Orientation"
+
+[node name="OrientationOption" type="OptionButton" parent="Margin/Rows/Fields"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HexSizeLabel" type="Label" parent="Margin/Rows/Fields"]
+layout_mode = 2
+text = "Hex size"
+
+[node name="HexSizeSpin" type="SpinBox" parent="Margin/Rows/Fields"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+suffix = "px"
+
+[node name="ApplyButton" type="Button" parent="Margin/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Apply"

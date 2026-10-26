@@ -21,6 +21,14 @@ func _init(p_grid: HexGrid, p_layout: HexLayout) -> void:
 	layout = p_layout
 
 
+## Switches to a new map. Clears hover and selection, since old hexes may no longer exist.
+func set_map(p_grid: HexGrid, p_layout: HexLayout) -> void:
+	clear_hover()
+	clear_selection()
+	grid = p_grid
+	layout = p_layout
+
+
 ## Updates the hovered hex from a map-space position.
 func update_hover(map_position: Vector2) -> void:
 	var hex: Vector2i = layout.pixel_to_hex(map_position)

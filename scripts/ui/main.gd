@@ -13,17 +13,41 @@ var _controller: EditorController
 @onready var _highlight: HexHighlight = $HexHighlight
 @onready var _camera: MapCamera = $MapCamera
 @onready var _status_bar: StatusBar = $UI/StatusBar
+@onready var _settings_panel: MapSettingsPanel = $UI/MapSettingsPanel
 
 
 func _ready() -> void:
-	var grid := HexGrid.new(map_width, map_height)
-	var layout := HexLayout.new(orientation, Vector2(hex_size, hex_size))
-	_renderer.set_map(grid, layout)
-	_highlight.layout = layout
-	_controller = EditorController.new(grid, layout)
+	_controller = EditorController.new(HexGrid.new(map_width, map_height), _make_layout())
 	_controller.hovered_changed.connect(_on_hovered_changed)
 	_controller.selected_changed.connect(_on_selected_changed)
 	_camera.view_changed.connect(_on_view_changed)
+	_settings_panel.settings_applied.connect(rebuild_map)
+	_settings_panel.set_settings(map_width, map_height, orientation, hex_size)
+	_show_map()
+
+
+## Replaces the map with a new grid of the given size, orientation and hex size, then fits the view.
+func rebuild_map(
+	p_width: int, p_height: int, p_orientation: HexLayout.HexOrientation, p_hex_size: float
+) -> void:
+	map_width = p_width
+	map_height = p_height
+	orientation = p_orientation
+	hex_size = p_hex_size
+	_controller.set_map(HexGrid.new(map_width, map_height), _make_layout())
+	_show_map()
+
+
+func _make_layout() -> HexLayout:
+	return HexLayout.new(orientation, Vector2(hex_size, hex_size))
+
+
+func _show_map() -> void:
+	var grid: HexGrid = _controller.grid
+	var layout: HexLayout = _controller.layout
+	_renderer.set_map(grid, layout)
+	_highlight.layout = layout
+	_highlight.queue_redraw()
 	_status_bar.set_map_info(grid.width, grid.height, layout.orientation)
 	_camera.map_rect = _renderer.get_map_rect()
 	_camera.fit_to_map()

@@ -32,8 +32,14 @@
     even-r offset), map size/orientation, zoom %.
   - `test_main_scene.gd` checks the acceptance criteria headless: 100 × 100 map loads, and
     clicking identifies hexes (corners included) in both orientations.
-- [ ] Step 4b: map settings panel (width, height, orientation, hex size → rebuild map).
-      Then manual acceptance check in the Windows editor → Milestone 1 done.
+- [x] Step 4b: map settings panel, 52 tests green
+  - `MapSettingsPanel` (`scenes/editor/map_settings_panel.tscn`, top-right): width/height
+    (1–1000), orientation, hex size (4–256 px), Apply → `settings_applied` signal.
+  - `Main.rebuild_map()` swaps in a new grid/layout, redraws, refits the camera and
+    updates the status bar. `EditorController.set_map()` clears hover and selection.
+  - Renderer frees old chunks immediately (no orphan nodes after a rebuild).
+- [ ] Manual acceptance check in the Windows editor (navigate 100 × 100, click-identify
+      hexes, change map settings) → Milestone 1 done. Next: Milestone 2.
 
 ## Known issues
 - Bounds are always even-r. Flat-top maps therefore come out slanted, not rectangular,

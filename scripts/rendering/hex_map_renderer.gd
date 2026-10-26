@@ -39,7 +39,7 @@ func get_chunks() -> Array[HexGridChunk]:
 func _rebuild_chunks() -> void:
 	for chunk: HexGridChunk in get_chunks():
 		remove_child(chunk)
-		chunk.queue_free()
+		chunk.free()
 	_map_rect = Rect2()
 	if _grid == null or _layout == null:
 		return

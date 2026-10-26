@@ -57,8 +57,11 @@
 - [ ] Step 4: terrain palette, paint/erase tools (drag = one undo step), undo/redo shortcuts.
 - [ ] Step 5: layer panel (create, rename, hide, lock, reorder, delete).
 - [ ] Step 6: selection tool (single, group, rectangle), then fill.
-- Open question: sprite art for the "multi-sprite map" acceptance (user-supplied pack vs.
-  generated placeholder PNGs).
+- [x] Placeholder sprites: 64 × 64 PNGs, two variants per starter terrain, in
+  `resources/sprite_packs/placeholder/`, linked as `variants` in each terrain `.tres`.
+  Generated deterministically by `tools/generate_placeholder_sprites.gd`
+  (`godot --headless --path . -s res://tools/generate_placeholder_sprites.gd`, then `--import`).
+  Square, orientation-agnostic textures: the renderer should UV-map them onto the hex polygon.
 
 ## Known issues
 - Bounds are always even-r. Flat-top maps therefore come out slanted, not rectangular,

@@ -1,6 +1,8 @@
 [gd_resource type="Resource" script_class="TerrainDefinition" format=3]
 
 [ext_resource type="Script" path="res://scripts/core/terrain_definition.gd" id="1_terrain"]
+[ext_resource type="Texture2D" path="res://resources/sprite_packs/placeholder/water_0.png" id="2_water0"]
+[ext_resource type="Texture2D" path="res://resources/sprite_packs/placeholder/water_1.png" id="3_water1"]
 
 [resource]
 script = ExtResource("1_terrain")
@@ -8,3 +10,4 @@ id = &"water"
 display_name = "Water"
 category = "Water"
 color = Color(0.22, 0.46, 0.78, 1)
+variants = Array[Texture2D]([ExtResource("2_water0"), ExtResource("3_water1")])

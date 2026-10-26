@@ -1,6 +1,8 @@
 [gd_resource type="Resource" script_class="TerrainDefinition" format=3]
 
 [ext_resource type="Script" path="res://scripts/core/terrain_definition.gd" id="1_terrain"]
+[ext_resource type="Texture2D" path="res://resources/sprite_packs/placeholder/snow_0.png" id="2_snow0"]
+[ext_resource type="Texture2D" path="res://resources/sprite_packs/placeholder/snow_1.png" id="3_snow1"]
 
 [resource]
 script = ExtResource("1_terrain")
@@ -8,3 +10,4 @@ id = &"snow"
 display_name = "Snow"
 category = "Snow and tundra"
 color = Color(0.92, 0.95, 0.98, 1)
+variants = Array[Texture2D]([ExtResource("2_snow0"), ExtResource("3_snow1")])

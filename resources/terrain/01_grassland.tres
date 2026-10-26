@@ -1,6 +1,8 @@
 [gd_resource type="Resource" script_class="TerrainDefinition" format=3]
 
 [ext_resource type="Script" path="res://scripts/core/terrain_definition.gd" id="1_terrain"]
+[ext_resource type="Texture2D" path="res://resources/sprite_packs/placeholder/grassland_0.png" id="2_grassland0"]
+[ext_resource type="Texture2D" path="res://resources/sprite_packs/placeholder/grassland_1.png" id="3_grassland1"]
 
 [resource]
 script = ExtResource("1_terrain")
@@ -8,3 +10,4 @@ id = &"grassland"
 display_name = "Grassland"
 category = "Grassland"
 color = Color(0.55, 0.74, 0.36, 1)
+variants = Array[Texture2D]([ExtResource("2_grassland0"), ExtResource("3_grassland1")])

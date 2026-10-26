@@ -43,6 +43,9 @@ func test_starter_terrains_load() -> void:
 		var definition: TerrainDefinition = registry.get_definition(id)
 		assert_false(definition.display_name.is_empty(), "%s has a name" % id)
 		assert_ne(definition.color, Color.MAGENTA, "%s has its own colour" % id)
+		assert_eq(definition.variants.size(), 2, "%s has two placeholder sprites" % id)
+		for variant: int in definition.variants.size():
+			assert_not_null(definition.get_variant_texture(variant), "%s variant %d loads" % [id, variant])
 
 
 func test_variant_texture_wraps_and_handles_empty() -> void:

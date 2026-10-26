@@ -52,7 +52,15 @@
     add/insert/remove/move/rename/visible/locked; per-layer sparse cells; `set_cells()`
     batches edits into one `cells_changed` signal. `MapData.create_default()` adds the six
     spec layers. `MapCell` (terrain_id + variant) is immutable by convention.
-- [ ] Step 2: `EditCommand` + undo stack; paint/erase commands storing only affected cells.
+- [x] Step 2: undo/redo, 75 tests green
+  - `EditCommand` (`scripts/tools/`): `do()` / `undo()` / `is_empty()` / `get_description()`.
+  - `SetCellsCommand`: before/after of only the affected hexes on one layer.
+    `paint()` / `erase()` factories skip out-of-bounds and unchanged hexes and return an
+    empty command on locked or missing layers. `merge()` folds a drag stroke into one step.
+  - `UndoStack`: `execute()`, `push_done()` (for strokes applied live), undo/redo,
+    redo cleared on new edits, `max_size` (200), `changed` signal, descriptions.
+  - Tests: round trips, layer isolation, locked layers, merged strokes, 40 random edits
+    undone/redone back to identical snapshots.
 - [ ] Step 3: chunked terrain renderer (sprite or placeholder colour, per visible layer).
 - [ ] Step 4: terrain palette, paint/erase tools (drag = one undo step), undo/redo shortcuts.
 - [ ] Step 5: layer panel (create, rename, hide, lock, reorder, delete).

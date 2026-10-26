@@ -7,7 +7,7 @@
 - Name: "Hexmer - Map Maker".
 - Offset layout decision: even-r (pointy-top); even-q (flat-top) planned.
 
-## Milestone 1 — Hex grid foundation (in progress)
+## Milestone 1 — Hex grid foundation — done (manual acceptance passed)
 - [x] Step 1: core hex math (`scripts/core/`), 22 tests green
   - `HexCoordinates`: axial↔cube, cube rounding, distance, neighbours, lines, even-r offset.
   - `HexLayout`: pointy/flat orientation, hex size, origin; hex↔pixel, corners.
@@ -38,13 +38,34 @@
   - `Main.rebuild_map()` swaps in a new grid/layout, redraws, refits the camera and
     updates the status bar. `EditorController.set_map()` clears hover and selection.
   - Renderer frees old chunks immediately (no orphan nodes after a rebuild).
-- [ ] Manual acceptance check in the Windows editor (navigate 100 × 100, click-identify
-      hexes, change map settings) → Milestone 1 done. Next: Milestone 2.
+- [x] Manual acceptance check in the Windows editor.
+
+## Milestone 2 — Sprite painting and layers (in progress)
+- [x] Step 1: core map data + terrain library, 65 tests green
+  - `TerrainDefinition` (Resource): id, display name, category, placeholder colour, sprite
+    variants (wrap on out-of-range index; none → placeholder).
+  - `TerrainRegistry`: id → definition, categories, loads `.tres` folders; unknown IDs
+    resolve to null so cells keep their logical data.
+  - Starter terrains in `resources/terrain/` (grassland, forest, mountains, water, desert,
+    snow): colours only, no sprite art yet.
+  - `MapData`: grid, layout, `map_seed`, ordered layers (index 0 = bottom) with
+    add/insert/remove/move/rename/visible/locked; per-layer sparse cells; `set_cells()`
+    batches edits into one `cells_changed` signal. `MapData.create_default()` adds the six
+    spec layers. `MapCell` (terrain_id + variant) is immutable by convention.
+- [ ] Step 2: `EditCommand` + undo stack; paint/erase commands storing only affected cells.
+- [ ] Step 3: chunked terrain renderer (sprite or placeholder colour, per visible layer).
+- [ ] Step 4: terrain palette, paint/erase tools (drag = one undo step), undo/redo shortcuts.
+- [ ] Step 5: layer panel (create, rename, hide, lock, reorder, delete).
+- [ ] Step 6: selection tool (single, group, rectangle), then fill.
+- Open question: sprite art for the "multi-sprite map" acceptance (user-supplied pack vs.
+  generated placeholder PNGs).
 
 ## Known issues
 - Bounds are always even-r. Flat-top maps therefore come out slanted, not rectangular,
   until even-q is added.
 - Touchpad pinch/pan gestures (`InputEventMagnifyGesture` / `InputEventPanGesture`) are not
   handled yet; touchpad scrolling works as wheel zoom.
+- `MapData` is not wired into the main scene yet (step 3/4).
+- GDScript consts can't use `PackedStringArray(...)` constructors; use typed `Array[String]`.
 - The layout enum is `HexLayout.HexOrientation`; plain `Orientation` clashes with Godot's
   global `Orientation` enum.

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TerrainDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/core/terrain_definition.gd" id="1_terrain"]
+
+[resource]
+script = ExtResource("1_terrain")
+id = &"snow"
+display_name = "Snow"
+category = "Snow and tundra"
+color = Color(0.92, 0.95, 0.98, 1)

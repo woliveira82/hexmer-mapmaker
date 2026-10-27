@@ -71,8 +71,7 @@
   - `cells_changed` redraws only the touched chunks; `layers_changed` redraws all.
   - `MapData.fill_layer()`. `Main` owns `MapData` + `TerrainRegistry`; new maps (and
     Map settings → Apply) fill the base layer with `default_terrain` (grassland).
-- [ ] **Manual check in the Windows editor:** grassland sprites under the grid outlines,
-      both orientations, after Apply. (Step 3; not yet reported.)
+- [x] Manual check in the Windows editor (step 3): validated.
 - [x] Step 4: palette, paint/erase, undo/redo, 107 tests green
   - `EditorController` now takes `MapData` + `TerrainRegistry` (`grid`/`layout` are
     getters). Owns the `UndoStack`, `active_tool` (SELECT/PAINT/ERASE), `active_terrain`,
@@ -89,8 +88,7 @@
   - InputMap: `edit_undo` Ctrl+Z, `edit_redo` Ctrl+Y / Ctrl+Shift+Z, `tool_select` S,
     `tool_paint` B, `tool_erase` E (logical keys, matched exactly).
   - Mouse release is caught in `_input`, so a stroke ends even if released over a panel.
-- [ ] **Manual check in the Windows editor:** paint/erase strokes, fast drags, undo/redo
-      buttons + shortcuts, palette layout at the default 1152 × 648 window.
+- [x] Manual check in the Windows editor (step 4): validated.
 - [ ] Step 5: layer panel (create, rename, hide, lock, reorder, delete).
 - [ ] Step 6: selection tool (single, group, rectangle), then fill.
 - [x] Placeholder sprites: 64 × 64 PNGs, two variants per starter terrain, in

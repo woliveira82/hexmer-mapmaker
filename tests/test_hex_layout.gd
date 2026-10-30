@@ -79,3 +79,17 @@ func test_changing_orientation_updates_mapping() -> void:
 	var layout := HexLayout.new(HexLayout.HexOrientation.POINTY_TOP, Vector2(10.0, 10.0))
 	layout.orientation = HexLayout.HexOrientation.FLAT_TOP
 	_assert_near(layout.hex_to_pixel(Vector2i(1, 0)), Vector2(15.0, 5.0 * HexLayout.SQRT3), "flat q+1")
+
+
+func test_hexes_bounds_matches_corner_bounds() -> void:
+	for orientation: HexLayout.HexOrientation in [HexLayout.HexOrientation.POINTY_TOP, HexLayout.HexOrientation.FLAT_TOP]:
+		var layout := HexLayout.new(orientation, Vector2(20.0, 20.0), Vector2(5.0, -3.0))
+		var hexes: Array[Vector2i] = HexGrid.new(7, 5).cells()
+		var expected := Rect2(layout.polygon_corners(hexes[0])[0], Vector2.ZERO)
+		for hex: Vector2i in hexes:
+			for corner: Vector2 in layout.polygon_corners(hex):
+				expected = expected.expand(corner)
+		var bounds: Rect2 = layout.hexes_bounds(hexes)
+		assert_almost_eq(bounds.position, expected.position, Vector2(0.001, 0.001))
+		assert_almost_eq(bounds.size, expected.size, Vector2(0.001, 0.001))
+	assert_eq(HexLayout.new().hexes_bounds([] as Array[Vector2i]), Rect2())

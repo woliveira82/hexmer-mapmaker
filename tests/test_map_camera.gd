@@ -100,3 +100,12 @@ func test_left_drag_pans_only_with_space_held() -> void:
 func test_motion_without_drag_does_not_pan() -> void:
 	_camera._unhandled_input(_motion(Vector2(50.0, 50.0)))
 	assert_eq(_camera.position, Vector2.ZERO)
+
+
+func test_view_rect_is_viewport_in_map_space() -> void:
+	_camera.position = Vector2(100.0, 50.0)
+	_camera.zoom = Vector2(0.5, 0.5)
+	var view_size: Vector2 = _camera.get_viewport_rect().size
+	var rect: Rect2 = _camera.get_view_rect()
+	assert_almost_eq(rect.get_center(), Vector2(100.0, 50.0), Vector2(EPSILON, EPSILON))
+	assert_almost_eq(rect.size, view_size * 2.0, Vector2(EPSILON, EPSILON))

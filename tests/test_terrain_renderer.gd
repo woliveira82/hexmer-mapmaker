@@ -32,6 +32,11 @@ func _layer_id(map: MapData, index: int) -> int:
 	return map.get_layers()[index].id
 
 
+## True if colours match to 8-bit image precision.
+func _close(a: Color, b: Color) -> bool:
+	return absf(a.r - b.r) < 0.01 and absf(a.g - b.g) < 0.01 and absf(a.b - b.b) < 0.01 and absf(a.a - b.a) < 0.01
+
+
 func _total_hexes(batches: Array[TerrainChunk.Batch]) -> int:
 	var total: int = 0
 	for batch: TerrainChunk.Batch in batches:
@@ -138,4 +143,69 @@ func test_set_map_again_switches_signals() -> void:
 	assert_eq(old_map.cells_changed.get_connections().size(), 0)
 	assert_eq(old_map.layers_changed.get_connections().size(), 0)
 	assert_eq(new_map.cells_changed.get_connections().size(), 1)
+	assert_eq(old_map.layer_content_changed.get_connections().size(), 0)
+	assert_eq(new_map.layer_content_changed.get_connections().size(), 1)
 	assert_eq(renderer.get_chunks().size(), 4)
+
+
+func test_set_view_culls_and_switches_detail() -> void:
+	var map := _make_map(64, 64)
+	map.fill_layer(_layer_id(map, 0), MapCell.new(&"water"))
+	var renderer := _make_renderer(map)
+	var first: TerrainChunk = renderer.get_chunks()[0]
+	renderer.set_view(first.bounds.grow(-1.0), 1.0)
+	assert_true(first.visible)
+	var hidden: int = 0
+	for chunk: TerrainChunk in renderer.get_chunks():
+		if not chunk.visible:
+			hidden += 1
+	assert_gt(hidden, 10)
+	assert_false(renderer.is_low_detail())
+	assert_false(first.low_detail)
+	renderer.set_view(Rect2(-1e6, -1e6, 2e6, 2e6), 0.05)
+	assert_true(renderer.is_low_detail(), "32 px hexes at 5 % are under 4 px")
+	for chunk: TerrainChunk in renderer.get_chunks():
+		assert_true(chunk.visible and chunk.low_detail)
+	renderer.set_map(_make_map(20, 20), _registry)
+	assert_true(renderer.get_chunks()[0].low_detail, "new chunks get the current detail level")
+
+
+func test_low_detail_image_uses_top_visible_layer() -> void:
+	var map := _make_map(16, 16)
+	var base: int = _layer_id(map, 0)
+	var details: int = _layer_id(map, 1)
+	map.fill_layer(base, MapCell.new(&"water"))
+	var hex: Vector2i = HexCoordinates.even_r_to_axial(Vector2i(3, 2))
+	map.set_cell(details, hex, MapCell.new(&"desert"))
+	map.set_layer_visible(_layer_id(map, 2), false)
+	var chunk: TerrainChunk = _make_renderer(map).get_chunks()[0]
+	var image: Image = chunk.build_low_detail_image()
+	assert_eq(image.get_size(), Vector2i(16, 16))
+	var water: Color = _registry.get_definition(&"water").color
+	var desert: Color = _registry.get_definition(&"desert").color
+	assert_true(_close(image.get_pixel(3, 2), desert), "upper layer wins")
+	assert_true(_close(image.get_pixel(4, 2), water))
+	map.set_layer_visible(details, false)
+	assert_true(_close(chunk.build_low_detail_image().get_pixel(3, 2), water), "hidden layer ignored")
+
+
+func test_low_detail_image_is_transparent_where_empty_and_clipped_at_map_edge() -> void:
+	var map := _make_map(20, 18)
+	var renderer := _make_renderer(map)
+	var corner: TerrainChunk = renderer.get_chunk_for(HexCoordinates.even_r_to_axial(Vector2i(17, 17)))
+	var image: Image = corner.build_low_detail_image()
+	assert_eq(image.get_size(), Vector2i(4, 2), "chunk clipped to the 20 × 18 map")
+	assert_eq(image.get_pixel(0, 0).a, 0.0)
+
+
+func test_low_detail_transform_puts_pixels_on_hexes() -> void:
+	for orientation: HexLayout.HexOrientation in ORIENTATIONS:
+		var map := _make_map(40, 40, orientation)
+		var renderer := _make_renderer(map)
+		for offset: Vector2i in [Vector2i(16, 16), Vector2i(20, 18), Vector2i(23, 21), Vector2i(31, 31)]:
+			var hex: Vector2i = HexCoordinates.even_r_to_axial(offset)
+			var chunk: TerrainChunk = renderer.get_chunk_for(hex)
+			var pixel_center := Vector2(offset - Vector2i(16, 16)) + Vector2(0.5, 0.5)
+			var placed: Vector2 = chunk.get_low_detail_transform() * pixel_center
+			var error: float = placed.distance_to(map.layout.hex_to_pixel(hex))
+			assert_lt(error, map.layout.hex_size.x * 0.5, "%s offset %s within a quarter hex width" % [orientation, offset])

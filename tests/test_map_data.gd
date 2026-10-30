@@ -117,5 +117,6 @@ func test_fill_layer_covers_every_hex_on_that_layer_only() -> void:
 	assert_eq(map.fill_layer(base, MapCell.new(&"grassland")), 80)
 	assert_eq(map.get_layer(base).cell_count(), 80)
 	assert_eq(map.get_layers()[1].cell_count(), 0)
-	assert_signal_emit_count(map, "cells_changed", 1)
+	assert_signal_emitted_with_parameters(map, "layer_content_changed", [base])
+	assert_signal_not_emitted(map, "cells_changed", "no per-hex list for a whole-layer fill")
 	assert_eq(map.fill_layer(999, MapCell.new(&"grassland")), 0, "missing layer")

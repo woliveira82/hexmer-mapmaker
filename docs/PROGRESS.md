@@ -89,6 +89,15 @@
     `tool_paint` B, `tool_erase` E (logical keys, matched exactly).
   - Mouse release is caught in `_input`, so a stroke ends even if released over a panel.
 - [x] Manual check in the Windows editor (step 4): validated.
+- [x] Large-map performance, 115 tests green
+  - Both renderers take `set_view(view_rect, zoom)` from the camera (`MapCamera.get_view_rect()`);
+    chunks outside the view are hidden, and Godot skips drawing hidden chunks until shown.
+  - Low detail: below 4 px on-screen hex radius, terrain chunks draw a one-pixel-per-hex
+    image (top visible layer's colour) and the grid is hidden. `HexGridChunk` builds its
+    outlines on first draw. Empty layers are skipped when building.
+  - `MapData.fill_layer()` writes directly and emits `layer_content_changed(layer_id)`
+    instead of a per-hex `cells_changed`. `HexLayout.hexes_bounds()` for chunk bounds.
+  - 1000 × 1000 Apply: ~15 s → ~2.8 s. Hiding a layer while zoomed in: ~9 s → ~12 ms.
 - [ ] Step 5: layer panel (create, rename, hide, lock, reorder, delete).
 - [ ] Step 6: selection tool (single, group, rectangle), then fill.
 - [x] Placeholder sprites: 64 × 64 PNGs, two variants per starter terrain, in
@@ -105,10 +114,12 @@
 - Dragging across a panel pauses the stroke; re-entering the map joins the two points with
   a line, which can paint hexes hidden under the panel.
 - Hover does not show the hex's terrain in the status bar yet.
-- Large maps are slow: create + first draw takes ~0.1 s at 100 × 100, ~1 s at 300 × 300,
-  ~12 s and ~140 MB at 1000 × 1000 (headless timing). Layer visibility/order changes redraw
-  every chunk (~9 s at 1000 × 1000). Options: build batches only for on-screen chunks,
-  cache batches per layer, or a lower size limit.
+- Large maps: Apply on 1000 × 1000 takes ~2.8 s (headless: ~1.6 s building, ~1.2 s first
+  draw); 300 × 300 ~0.25 s. The remaining cost is the base-layer fill (~0.7 s, one
+  dictionary entry per hex), chunk setup (~0.9 s for both renderers) and the first
+  low-detail draw of every chunk. Zoom-to-fit 1000 × 1000 draws flat colours, no sprites.
+- Low-detail mode places each hex pixel within a quarter hex of its true position (even-r
+  rows alternate a half-hex shift). Only visible below 4 px hexes.
 - GDScript consts can't use `PackedStringArray(...)` constructors; use typed `Array[String]`.
 - The layout enum is `HexLayout.HexOrientation`; plain `Orientation` clashes with Godot's
   global `Orientation` enum.

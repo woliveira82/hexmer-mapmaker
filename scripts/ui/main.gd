@@ -150,6 +150,9 @@ func _on_undo_stack_changed() -> void:
 
 
 func _on_view_changed() -> void:
+	var view_rect: Rect2 = _camera.get_view_rect()
+	_terrain_renderer.set_view(view_rect, _camera.get_zoom_level())
+	_renderer.set_view(view_rect, _camera.get_zoom_level())
 	_highlight.set_zoom(_camera.get_zoom_level())
 	_status_bar.set_zoom(_camera.get_zoom_level())
 	# The map moved under a stationary cursor, so the hovered hex may have changed.

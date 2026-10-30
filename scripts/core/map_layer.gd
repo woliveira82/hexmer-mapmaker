@@ -29,6 +29,13 @@ func set_cell(hex: Vector2i, cell: MapCell) -> void:
 		_cells[hex] = cell
 
 
+## Sets every hex in [param hexes] to [param cell] (shared; cells are immutable). Does no
+## bounds checking: callers pass hexes known to be on the map.
+func fill(hexes: Array[Vector2i], cell: MapCell) -> void:
+	for hex: Vector2i in hexes:
+		_cells[hex] = cell
+
+
 ## Returns the number of non-empty hexes.
 func cell_count() -> int:
 	return _cells.size()

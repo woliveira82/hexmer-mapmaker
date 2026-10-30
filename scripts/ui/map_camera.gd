@@ -31,6 +31,13 @@ func get_zoom_level() -> float:
 	return zoom.x
 
 
+## Returns the map-space rectangle visible in the viewport. Assumes the camera's parent
+## is at the map origin, as in the main scene.
+func get_view_rect() -> Rect2:
+	var size: Vector2 = get_viewport_rect().size / zoom.x
+	return Rect2(position - size / 2.0, size)
+
+
 ## Returns true while a pan drag is in progress.
 func is_dragging() -> bool:
 	return _dragging

@@ -59,6 +59,19 @@ func corner_offset(index: int) -> Vector2:
 	return Vector2(cos(angle), sin(angle)) * hex_size
 
 
+## Returns the map-space bounding box of [param hexes] (empty Rect2 if there are none).
+func hexes_bounds(hexes: Array[Vector2i]) -> Rect2:
+	if hexes.is_empty():
+		return Rect2()
+	var centers := Rect2(hex_to_pixel(hexes[0]), Vector2.ZERO)
+	for hex: Vector2i in hexes:
+		centers = centers.expand(hex_to_pixel(hex))
+	var corners := Rect2(corner_offset(0), Vector2.ZERO)
+	for i: int in range(1, 6):
+		corners = corners.expand(corner_offset(i))
+	return Rect2(centers.position + corners.position, centers.size + corners.size)
+
+
 ## Returns the six map-space corners of [param hex].
 func polygon_corners(hex: Vector2i) -> PackedVector2Array:
 	var center: Vector2 = hex_to_pixel(hex)

@@ -4,6 +4,9 @@ class_name MapData
 
 ## Emitted when cells on a layer change.
 signal cells_changed(layer_id: int, hexes: Array[Vector2i])
+## Emitted when a whole layer's content changed at once (e.g. a fill); listeners should
+## treat every hex on that layer as changed.
+signal layer_content_changed(layer_id: int)
 ## Emitted when layers are added, removed, reordered, renamed, hidden or locked.
 signal layers_changed
 
@@ -147,12 +150,14 @@ func set_cell(layer_id: int, hex: Vector2i, cell: MapCell) -> bool:
 
 
 ## Sets every hex in the map on layer [param layer_id] to [param cell] (shared, since cells
-## are immutable). Returns how many were set.
+## are immutable) and emits [signal layer_content_changed]. Returns how many were set.
 func fill_layer(layer_id: int, cell: MapCell) -> int:
-	var cells: Dictionary[Vector2i, MapCell] = {}
-	for hex: Vector2i in grid.cells():
-		cells[hex] = cell
-	return set_cells(layer_id, cells)
+	var layer: MapLayer = get_layer(layer_id)
+	if layer == null:
+		return 0
+	layer.fill(grid.cells(), cell)
+	layer_content_changed.emit(layer_id)
+	return grid.cell_count()
 
 
 ## Sets several cells on one layer in one go (null values clear) and emits
